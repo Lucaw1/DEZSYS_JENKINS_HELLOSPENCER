@@ -7,15 +7,9 @@ pipeline {
     }
     environment {
         APP_PORT = '5556'
-        GITHUB_REPO = 'https://github.com/ThomasMicheler/DEZSYS_JENKINS_HELLOSPENCER.git'
+        GITHUB_REPO = 'https://github.com/Lucaw1/DEZSYS_JENKINS_HELLOSPENCER.git'
     }
     stages {
-        stage('Pre-Build Cleanup') {
-            steps {
-                // Kill any existing Flask processes
-                sh 'pkill -f "python hello.py" || true'
-            }
-        }
         stage('Checkout') {
             steps {
                 cleanWs()
@@ -26,9 +20,7 @@ pipeline {
             steps {
                 sh '''
                     python -m pip install --upgrade pip
-                    pip install flask
-                    pip install requests
-                    pip install pytest
+                    pip install -r requirements.txt
                     if [ ! -f count.txt ]; then
                         echo "0" > count.txt
                     fi
@@ -38,10 +30,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh '''
-                    # Run the unit tests
-                    python -m pytest tests/test_hello.py -v
-                '''
+                sh 'python -m pytest tests/test_hello.py -v'
             }
         }
         stage('Run') {
@@ -55,19 +44,12 @@ pipeline {
         }
         stage('Test API') {
             steps {
-                sh 'python tests/test_api.py'
-            }
-        }
-        stage('Keep Alive') {
-            steps {
-                // Keep the container running indefinitely
-                sh 'sleep infinity'
+                sh 'python -m pytest tests/test_api.py -v'
             }
         }
     }
     post {
         always {
-            // Cleanup: Stop the Flask application
             sh 'pkill -f "python src/hello.py" || true'
         }
     }
