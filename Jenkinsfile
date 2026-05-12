@@ -1,10 +1,6 @@
 pipeline {
-    agent {
-        docker { 
-            image 'python:3.11' 
-            args '-p 5556:5556'
-        }
-    }
+    agent any
+    
     environment {
         APP_PORT = '5556'
         GITHUB_REPO = 'https://github.com/Lucaw1/DEZSYS_JENKINS_HELLOSPENCER.git'
@@ -19,8 +15,8 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    python -m pip install --upgrade pip
-                    pip install -r requirements.txt
+                    python3 -m pip install --upgrade pip
+                    pip3 install -r requirements.txt
                     if [ ! -f count.txt ]; then
                         echo "0" > count.txt
                     fi
@@ -30,13 +26,13 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'python -m pytest tests/test_hello.py -v'
+                sh 'python3 -m pytest tests/test_hello.py -v'
             }
         }
         stage('Run') {
             steps {
                 sh '''
-                    nohup python src/hello.py > app.log 2>&1 &
+                    nohup python3 src/hello.py > app.log 2>&1 &
                     sleep 5
                     curl http://localhost:5556/api/hello
                 '''
@@ -44,13 +40,13 @@ pipeline {
         }
         stage('Test API') {
             steps {
-                sh 'python -m pytest tests/test_api.py -v'
+                sh 'python3 -m pytest tests/test_api.py -v'
             }
         }
     }
     post {
         always {
-            sh 'pkill -f "python src/hello.py" || true'
+            sh 'pkill -f "python3 src/hello.py" || true'
         }
     }
 }
