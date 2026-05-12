@@ -15,10 +15,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    python3 -m pip install --upgrade pip --break-system-packages
                     pip3 install -r requirements.txt --break-system-packages
                     if [ ! -f count.txt ]; then
-                       echo "0" > count.txt
+                        echo "0" > count.txt
                     fi
                     chmod 666 count.txt
                 '''
